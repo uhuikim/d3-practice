@@ -51,7 +51,7 @@ async function drawScatter() {
   const yScale = d3
     .scaleLinear()
     .domain([0, d3.max(bins, yAccessor)])
-    .range([dimensions.height, 0])
+    .range([dimensions.boundedHeight, 0])
     .nice();
 
   const binsGroup = bounds.append("g");
