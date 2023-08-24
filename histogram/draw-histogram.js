@@ -1,6 +1,7 @@
 async function drawScatter() {
   const dataset = await d3.json("../my_weather_data.json");
   const metricAccessor = (d) => d.humidity;
+  const yAccessor = (d) => d.length;
 
   const width = 600;
 
@@ -47,8 +48,6 @@ async function drawScatter() {
 
   const bins = binGenerator(dataset);
 
-  const yAccessor = (d) => d.length;
-
   const yScale = d3
     .scaleLinear()
     .domain([0, d3.max(bins, yAccessor)])
@@ -67,6 +66,17 @@ async function drawScatter() {
     .attr("width", (d) => d3.max([0, xScale(d.x1) - xScale(d.x0) - barPadding]))
     .attr("height", (d) => dimensions.boundedHeight - yScale(yAccessor(d)))
     .attr("fill", "cornflowerblue");
+
+  const barText = binGroup
+    .filter(yAccessor)
+    .append("text")
+    .attr("x", (d) => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
+    .attr("y", (d) => yScale(yAccessor(d)) - 5)
+    .text(yAccessor)
+    .style("text-anchor", "middle")
+    .attr("fill", "darkgrey")
+    .style("font-size", "12px")
+    .style("font-family", "sans-serif");
 }
 
 drawScatter();
