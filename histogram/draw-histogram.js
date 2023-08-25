@@ -1,4 +1,4 @@
-async function drawScatter() {
+async function drawHistogram() {
   const dataset = await d3.json("../my_weather_data.json");
   const metricAccessor = (d) => d.humidity;
   const yAccessor = (d) => d.length;
@@ -27,6 +27,13 @@ async function drawScatter() {
     .attr("width", dimensions.width)
     .attr("height", dimensions.height);
 
+  // 접근성
+  wrapper
+    .attr("role", "figure")
+    .attr("tabindex", "0")
+    .append("title")
+    .text("Histogram looking at the distribution of humidity over 2023");
+
   const bounds = wrapper
     .append("g")
     .style(
@@ -54,8 +61,25 @@ async function drawScatter() {
     .range([dimensions.boundedHeight, 0])
     .nice();
 
-  const binsGroup = bounds.append("g");
-  const binGroup = binsGroup.selectAll("g").data(bins).join("g");
+  const binsGroup = bounds
+    .append("g")
+    .attr("tabindex", "0")
+    .attr("role", "list")
+    .attr("aria-label", "histogram bars");
+
+  const binGroup = binsGroup
+    .selectAll("g")
+    .data(bins)
+    .join("g")
+    .attr("tabindex", "0")
+    .attr("role", "listitem")
+    .attr(
+      "aria-label",
+      (d) =>
+        `There were ${yAccessor(d)} days between ${d.x0
+          .toString()
+          .slice(0, 4)} and ${d.x1.toString().slice(0, 4)} humidity levels.`
+    );
 
   const barPadding = 1;
 
@@ -111,6 +135,12 @@ async function drawScatter() {
     .attr("fill", "black")
     .style("font-size", "1.4em")
     .text("Humidity");
+
+  // 접근성 처리
+  wrapper
+    .selectAll("text")
+    .attr("role", "presentation")
+    .attr("aria-hidden", "true");
 }
 
-drawScatter();
+drawHistogram();
